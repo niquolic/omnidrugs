@@ -1,11 +1,11 @@
 import React from 'react';
-import { View, Button, StyleSheet, TouchableOpacity, Text, Dimensions } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text, Dimensions } from 'react-native';
 import type { StackScreenProps } from '@react-navigation/stack';
 
 type RootStackParamList = {
   Home: undefined;
   Camera: undefined;
-  Result: { photoUri: string };
+  Result: { medicineInformations: any };
 };
 
 type Props = StackScreenProps<RootStackParamList, 'Home'>;
@@ -36,7 +36,7 @@ export default function HomeScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: { 
     flex: 1, 
-    backgroundColor: 'black'
+    backgroundColor: 'white'
   },
   titleContainer: {
     flex: 1,
@@ -44,13 +44,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    color: 'white',
+    color: 'black',
     fontSize: 48,
     fontWeight: 'bold',
     marginBottom: 10,
   },
   subtitle: {
-    color: 'white',
+    color: 'black',
     fontSize: 24,
     opacity: 0.8,
   },
@@ -62,7 +62,8 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: 'white',
-    fontSize: 24,
+    fontSize: 40,
     fontWeight: 'bold',
+    textAlign: 'center',
   }
 });

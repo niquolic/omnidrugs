@@ -1,12 +1,13 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
+import * as Speech from 'expo-speech';
 import type { StackScreenProps } from '@react-navigation/stack';
 
 type RootStackParamList = {
   Home: undefined;
   Camera: undefined;
-  Result: { photoUri: string };
+  Result: { medicineInformations: any };
 };
 
 type Props = StackScreenProps<RootStackParamList, 'Camera'>;
@@ -14,6 +15,7 @@ type Props = StackScreenProps<RootStackParamList, 'Camera'>;
 export default function CameraScreen({ navigation }: Props) {
   const cameraRef = useRef<any>(null);
   const [permission, requestPermission] = useCameraPermissions();
+  const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
     requestPermission();
@@ -21,8 +23,29 @@ export default function CameraScreen({ navigation }: Props) {
 
   const takePicture = async () => {
     if (cameraRef.current) {
-      const photo = await cameraRef.current.takePictureAsync();
-      navigation.navigate('Result', { photoUri: photo.uri });
+      setProcessing(true);
+      Speech.speak('Processing...', { language: 'en-US' });
+
+      const photo = await cameraRef.current.takePictureAsync({ base64: false });
+
+      const formData = new FormData();
+      formData.append('photo', {
+        uri: photo.uri,
+        name: 'photo.jpg',
+        type: 'image/jpeg',
+      } as any);
+
+      const response = await fetch('http://10.0.0.79:3000/recognize', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const medicineInformations = await response.json();
+
+      console.log('Medicine Information:', medicineInformations);
+
+      setProcessing(false);
+      navigation.navigate('Result', { medicineInformations });
     }
   };
 
@@ -31,22 +54,29 @@ export default function CameraScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.cameraContainer}>
-        <CameraView
-          style={styles.camera}
-          ref={cameraRef}
-          facing="back"
-        />
-      </View>
-
-      <TouchableOpacity
-        style={styles.captureButton}
-        onPress={takePicture}
-        accessibilityRole="button"
-        accessibilityLabel="Take a picture of the medicine"
-      >
-        <Text style={styles.buttonText}>📸 Take a picture</Text>
-      </TouchableOpacity>
+      {processing ? (
+        <View style={styles.processingContainer}>
+          <Text style={styles.processingText}>Processing...</Text>
+        </View>
+      ) : (
+        <>
+          <View style={styles.cameraContainer}>
+            <CameraView
+              style={styles.camera}
+              ref={cameraRef}
+              facing="back"
+            />
+          </View>
+          <TouchableOpacity
+            style={styles.captureButton}
+            onPress={takePicture}
+            accessibilityRole="button"
+            accessibilityLabel="Take a picture of the medicine"
+          >
+            <Text style={styles.buttonText}>📸 Take a picture</Text>
+          </TouchableOpacity>
+        </>
+      )}
     </View>
   );
 }
@@ -71,6 +101,17 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'white',
     fontSize: 36,
+    fontWeight: 'bold',
+  },
+  processingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'black',
+  },
+  processingText: {
+    color: 'white',
+    fontSize: 40,
     fontWeight: 'bold',
   },
 });
