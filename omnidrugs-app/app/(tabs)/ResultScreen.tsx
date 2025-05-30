@@ -25,7 +25,6 @@ export default function ResultScreen({ route, navigation }: Props) {
   let medicineDescription = null;
 
   if (!med?.informations?.description) {
-    console.log('0')
     medName = med?.informations.denomination || "Unknown";
     property = med?.informations.titulaires?.join(', ') || "Unknown";
     form = med?.informations.forme_pharmaceutique || "Unknown";
@@ -34,7 +33,6 @@ export default function ResultScreen({ route, navigation }: Props) {
       (s: any) => `${s.denominations?.join(', ')} (${s.dosage_substance})`
     ).join(', ') || "Unknown";
   } else {
-    console.log('1')
     medicineDescription = med?.informations.description
   }
 

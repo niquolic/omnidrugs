@@ -3,6 +3,7 @@ import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as Speech from 'expo-speech';
 import type { StackScreenProps } from '@react-navigation/stack';
+import { Ionicons } from '@expo/vector-icons';
 
 type RootStackParamList = {
   Home: undefined;
@@ -54,6 +55,18 @@ export default function CameraScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
+      ...{!processing && (
+          <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.navigate('Home')}
+          accessibilityRole="button"
+          accessibilityLabel="Cancel recognition"
+        >
+          <View style={styles.backIconContainer}>
+            <Ionicons name="arrow-back" size={40} color="black" />
+          </View>
+        </TouchableOpacity>
+      )}
       {processing ? (
         <View style={styles.processingContainer}>
           <Text style={styles.processingText}>Processing...</Text>
@@ -85,6 +98,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'black',
+  },
+  backButton: {
+    position: 'absolute',
+    top: 40,
+    left: 20,
+    zIndex: 10,
+  },
+  backIconContainer: {
+    backgroundColor: 'white',
+    borderRadius: 30,
+    padding: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   cameraContainer: {
     flex: 2,
