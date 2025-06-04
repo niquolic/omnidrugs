@@ -55,7 +55,7 @@ export default function CameraScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      ...{!processing && (
+      {!processing && (
           <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.navigate('Home')}
